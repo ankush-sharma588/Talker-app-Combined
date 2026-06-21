@@ -1,0 +1,17 @@
+{
+  "name": "talk-a-tive",
+  "version": "2.0.0",
+  "description": "MERN Stack Real-Time Chat Application",
+  "private": true,
+  "scripts": {
+    "server": "npm run dev --prefix backend",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "keywords": ["mern", "chat-app", "socket.io", "mongodb"],
+  "author": "Ankush",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

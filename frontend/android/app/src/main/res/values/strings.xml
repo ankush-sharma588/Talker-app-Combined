@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Talker</string>
+    <string name="title_activity_main">Talker</string>
+    <string name="package_name">com.talker.chatapp</string>
+    <string name="custom_url_scheme">com.talker.chatapp</string>
+</resources>

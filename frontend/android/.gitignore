@@ -1,0 +1,26 @@
+# Android / Gradle build outputs
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+
+# Capacitor auto-generates these on every `npx cap sync` — don't hand-edit
+# or diff them; they're regenerated from package.json + capacitor.config.js
+capacitor.settings.gradle
+capacitor.build.gradle
+capacitor-cordova-android-plugins/
+
+# Secrets — NEVER commit these
+keystore.properties
+*.jks
+*.keystore
+google-services.json
+/app/src/main/assets/public
+/app/src/main/assets/capacitor.config.json

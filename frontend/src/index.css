@@ -1,0 +1,273 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap");
+
+:root {
+  --accent: #7c3aed;
+  --accent-dim: rgba(124,58,237,0.12);
+  --chat-bg: #0d0d14;
+  --scroll-thumb: rgba(124,58,237,0.5);
+  --cyber-glow: 0 0 10px #b84bff, 0 0 20px #7c3aed55;
+  --cyber-border-color: #b84bff;
+  /* Android status bar / notch safe areas, populated by the WebView */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  /* 100vh is unreliable on Android Chrome/WebView once the on-screen keyboard
+     opens (it doesn't shrink, causing the input row to be covered). 100dvh
+     reacts to the real visible viewport. Modern WebView (Android 12+/Chrome 108+,
+     which Capacitor apps always ship) supports dvh. */
+  height: 100dvh;
+  overflow: hidden; /* the app manages its own internal scroll containers */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent; /* remove gray flash on tap on Android */
+  overscroll-behavior-y: contain; /* stop the whole page rubber-banding/refreshing on pull-down */
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+input, textarea, button {
+  font-size: 16px; /* inputs under 16px trigger an auto-zoom-in on focus on Android/iOS WebViews */
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 4px; }
+
+/* Messages area */
+.messages {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+  height: 100%;
+  padding: 4px 0;
+}
+
+/* ===================== CYBERPUNK THEME ===================== */
+
+body.cyberpunk-theme {
+  font-family: "Share Tech Mono", monospace;
+}
+
+body.cyberpunk-theme h1,
+body.cyberpunk-theme h2,
+body.cyberpunk-theme h3,
+body.cyberpunk-theme .cyber-font {
+  font-family: "Orbitron", monospace;
+}
+
+/* Animated neon border keyframes */
+@keyframes cyber-border-spin {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes neon-pulse {
+  0%, 100% { box-shadow: 0 0 8px #b84bff, 0 0 16px #7c3aed55, 0 0 32px #3b1aff22; }
+  50%       { box-shadow: 0 0 16px #b84bff, 0 0 32px #7c3aedaa, 0 0 48px #3b1aff44; }
+}
+
+@keyframes cyber-flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96%           { opacity: 0.85; }
+  97%           { opacity: 1; }
+  98%           { opacity: 0.9; }
+}
+
+@keyframes scanline {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes border-dance {
+  0%   { border-color: #b84bff; box-shadow: 0 0 8px #b84bff55; }
+  33%  { border-color: #3b82f6; box-shadow: 0 0 8px #3b82f655; }
+  66%  { border-color: #06b6d4; box-shadow: 0 0 8px #06b6d455; }
+  100% { border-color: #b84bff; box-shadow: 0 0 8px #b84bff55; }
+}
+
+@keyframes text-glow-pulse {
+  0%, 100% { text-shadow: 0 0 8px currentColor, 0 0 16px currentColor; }
+  50%       { text-shadow: 0 0 4px currentColor; }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Cyberpunk animated border utility */
+.cyber-border {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cyber-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #b84bff, #3b82f6, #06b6d4, #b84bff);
+  background-size: 300% 300%;
+  animation: cyber-border-spin 4s linear infinite;
+  z-index: 0;
+}
+
+.cyber-border > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Cyberpunk card glow */
+.cyber-card {
+  animation: neon-pulse 3s ease-in-out infinite;
+  border: 1px solid #b84bff44;
+  transition: all 0.3s ease;
+}
+
+.cyber-card:hover {
+  animation: neon-pulse 1.5s ease-in-out infinite;
+  transform: translateY(-1px);
+}
+
+/* Neon text glow for accented elements */
+.cyber-glow-text {
+  animation: text-glow-pulse 2s ease-in-out infinite;
+}
+
+/* Message entrance animations */
+.cyber-message-mine {
+  animation: slideInRight 0.25s ease-out both;
+}
+
+.cyber-message-other {
+  animation: slideInLeft 0.25s ease-out both;
+}
+
+/* Chat item hover neon sweep */
+.cyber-chat-item {
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-chat-item::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(184,75,255,0.08), transparent);
+  transition: left 0.4s ease;
+}
+
+.cyber-chat-item:hover::after {
+  left: 100%;
+}
+
+/* Cyberpunk input focus glow */
+.cyber-input:focus {
+  border-color: #b84bff !important;
+  box-shadow: 0 0 0 1px #b84bff, 0 0 12px #b84bff44 !important;
+  outline: none;
+}
+
+/* Button neon hover */
+.cyber-btn {
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-btn:hover {
+  box-shadow: 0 0 12px var(--accent), 0 0 24px var(--accent)44;
+  transform: translateY(-1px);
+}
+
+.cyber-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 6px var(--accent);
+}
+
+/* Animated scrollbar for cyberpunk */
+body.cyberpunk-theme ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #b84bff, #3b82f6);
+  border-radius: 4px;
+}
+
+/* Scanline overlay (subtle) */
+body.cyberpunk-theme::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Header neon underline */
+.cyber-header-line {
+  background: linear-gradient(90deg, #b84bff, #3b82f6, #06b6d4);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+  height: 2px;
+  width: 100%;
+}
+
+/* Typing indicator cyberpunk dots */
+body.cyberpunk-theme .typing-dot {
+  background: #b84bff !important;
+  box-shadow: 0 0 6px #b84bff;
+}
+
+/* Fade-up animation for modals/drawers */
+.cyber-fade-up {
+  animation: fadeUp 0.3s ease-out both;
+}
+
+/* Glitch badge animation */
+@keyframes glitch {
+  0%, 90%, 100% { clip-path: none; transform: none; }
+  91% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); transform: translate(-2px, 0); }
+  92% { clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); transform: translate(2px, 0); }
+  93% { clip-path: none; transform: none; }
+}
+
+.cyber-badge {
+  animation: glitch 5s ease-in-out infinite;
+}

@@ -1,0 +1,143 @@
+apply plugin: 'com.android.application'
+
+// Loads keystore credentials from android/keystore.properties (NOT committed
+// to git — see RELEASE_BUILD.md). If that file doesn't exist (e.g. CI running
+// a debug build only), release signing config simply won't be configured and
+// `assembleDebug` still works fine; only `assembleRelease`/`bundleRelease`
+// require it.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    namespace "com.talker.chatapp"
+    compileSdk rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        applicationId "com.talker.chatapp"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        // Bump versionCode for every Play Store upload; versionName is the
+        // human-readable version shown to users.
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+        multiDexEnabled true
+        // Strips unused translated-string resources that AndroidX/Firebase/
+        // Play Services AARs bundle for dozens of locales by default. Add
+        // more locale codes here (comma-separated) if you localize the app
+        // beyond English — this only removes resources, not functionality.
+        resConfigs "en"
+    }
+
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            // Debug builds stay unminified for fast iteration and readable
+            // stack traces; they're signed with Android's auto-generated
+            // debug key, which is why `assembleDebug` needs no setup at all.
+            minifyEnabled false
+            shrinkResources false
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+            // If you need to inspect a release build's crash reports, keep a
+            // mapping.txt backup per release (R8 renames classes/methods).
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    packagingOptions {
+        resources {
+            // Strips files that are redundantly duplicated across several
+            // AARs (every dependency tends to ship its own copy of these),
+            // and would otherwise either bloat the APK or trigger a
+            // duplicate-file build error that AGP resolves by picking one
+            // copy arbitrarily — excluding them outright is cleaner than
+            // relying on that arbitrary pick.
+            excludes += [
+                'META-INF/DEPENDENCIES',
+                'META-INF/LICENSE',
+                'META-INF/LICENSE.txt',
+                'META-INF/LICENSE-notice.md',
+                'META-INF/NOTICE',
+                'META-INF/NOTICE.txt',
+                'META-INF/*.kotlin_module'
+            ]
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.activity:activity:$androidxActivityVersion"
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+
+    // Firebase Cloud Messaging — required by @capacitor/push-notifications.
+    // The BoM (Bill of Materials) pins compatible versions of all Firebase
+    // libraries so you don't need to specify a version per-artifact. Check
+    // https://firebase.google.com/support/release-notes/android for newer
+    // patch releases periodically — the BoM only coordinates versions, it
+    // doesn't change any API this code calls directly, so bumping it is low-risk.
+    implementation platform('com.google.firebase:firebase-bom:34.9.0')
+    implementation 'com.google.firebase:firebase-messaging'
+
+    // ── Required only once you complete the native screen-share bridge ──────
+    // Uncomment after picking a WebRTC SDK per NATIVE_SCREEN_SHARE.md:
+    // implementation 'io.github.webrtc-sdk:android:125.6422.06.1'
+}
+
+apply from: 'capacitor.build.gradle'
+// ^ also auto-generated by `npx cap sync android` — same as
+//   capacitor.settings.gradle, this file does not exist until that command
+//   has been run at least once.
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push notifications will not work until you add it — see PUSH_NOTIFICATIONS_SETUP.md")
+}

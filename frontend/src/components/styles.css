@@ -1,0 +1,16 @@
+.messages {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+
+.call-ring-avatar {
+  animation: call-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes call-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(184, 75, 255, 0.55); }
+  70%  { box-shadow: 0 0 0 16px rgba(184, 75, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(184, 75, 255, 0); }
+}
