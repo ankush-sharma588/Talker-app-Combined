@@ -1,20 +1,17 @@
-name: My First GitHub Action
+name: Keep Render App Awake
 
-# 1. Choose the event that triggers this automation
-on: [push]
+on:
+  schedule:
+    # Runs every 5 minutes (GitHub minimum recommended interval)
+    - cron: "*/5 * * * *"
+  workflow_dispatch: # allows manual trigger
 
-# 2. Define the jobs to run
 jobs:
-  say-hello:
-    # Choose the server operating system
+  ping:
     runs-on: ubuntu-latest
 
-    # List the chronological steps to execute
     steps:
-      # Step 1: Pull your repository code onto the runner machine
-      - name: Check out repository code
-        uses: actions/checkout@v4
-
-      # Step 2: Run a terminal command
-      - name: Run a welcome script
-        run: echo "Hello world! The action executed successfully."
+      - name: Ping Render App
+        run: |
+          echo "Pinging server..."
+          curl -s -o /dev/null -w "%{http_code}" https://talker-app-combined.onrender.com/
